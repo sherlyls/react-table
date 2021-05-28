@@ -1,109 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
-import {Data} from './Data'
-
-const useSortableData = (items, config = null) => {
-  const [sortConfig, setSortConfig] = React.useState(config);
-
-  const sortedItems = React.useMemo(() => {
-    console.log(...items, 'TEST')
-    let sortableItems = [...items];
-    if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableItems;
-  }, [items, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'ascending'
-    ) {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  return { items: sortedItems, requestSort, sortConfig };
-};
 
 const Table = (props) => {
-  const { items, requestSort, sortConfig } = useSortableData(props.Data);
-  const getClassNamesFor = (name) => {
-    console.log(name,"name")
-    if (!sortConfig) {
-      console.log(sortConfig,"sortconfig 1")
-      return;
-    }
-    console.log(sortConfig,"sortconfig 2")
-    return sortConfig.key === name ? sortConfig.direction : undefined;
-  };
-  
-  return(
-    <div>
-        <p>Data</p>
-       
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(20);
+  const [serial, setSerial] = useState('');
+  const [activePage, setActivePage] = useState('table');
+  const [selectedItem, setSelectedItem] = useState({});
 
+  const getDataPerangkat = () => {
+    fetch(`http://111482feb5e7.ngrok.io/user?page=${page}&limit=${limit}&serial=${serial}`)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            setItems(result)
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            
+          }
+        )
+  }
+  useEffect(() => {    
+    getDataPerangkat();
+  }, []);
+  return activePage === 'table' ? (
+    <div>
+        <input type="text" value={serial} onChange={(e) => setSerial(e.target.value)} />
+        <input type="button" value="Search" onClick={getDataPerangkat} />
+        <br/><br/>
         <table id="myTable">
             <thead>  
                 <tr>
                 <th>
-                  <button type="button" onClick={() => requestSort('serial')}
-                  className={getClassNamesFor('serial')}>
                   Serial
-                </button>
                 </th>
                 <th>
-                  <button type="button" onClick={() => requestSort('uid')}
-                  className={getClassNamesFor('uid')}>
-                  UID
-                </button>
+                  PC-Name
                 </th>
                 <th>
-                  <button type="button" onClick={() => requestSort('cn')}
-                  className={getClassNamesFor('cn')}>
-                  CN
-                </button>
+                  OS
                 </th>
                 <th>
-                  <button type="button" onClick={() => requestSort('displayName')}
-                  className={getClassNamesFor('displayName')}>
-                  Display Name
-                </button>
+                  OS
                 </th>
                 <th>
-                  <button type="button" onClick={() => requestSort('givenName')}
-                  className={getClassNamesFor('givenName')}>
-                  Serial
-                </button>
+                  System
                 </th>
                 <th>
-                  <button type="button" onClick={() => requestSort('personalTitle')}
-                  className={getClassNamesFor('personalTitle')}>
-                  Serial
-                </button>
-                </th>
-                <th>
-                  <button type="button" onClick={() => requestSort('o')}
-                  className={getClassNamesFor('o')}>
-                  Serial
-                </button>
-                </th>
-                <th>
-                  <button type="button" onClick={() => requestSort('ou')}
-                  className={getClassNamesFor('ou')}>
-                  Serial
-                </button>
+                  Processor
                 </th>
                 </tr> 
             </thead>
@@ -111,15 +59,12 @@ const Table = (props) => {
             <tbody>     
                     {items.map((item, index) => {
                         return(  
-                            <tr key={index}>
+                            <tr key={index} style={{cursor: "pointer"}} onClick={() => { setActivePage('detil'); setSelectedItem(item.User); }}>
                                 <td scope="col">{item.serial}</td>
-                                <td scope="col">{item.uid}</td>
-                                <td scope="col">{item.cn}</td>
-                                <td scope="col">{item.displayName}</td>
-                                <td scope="col">{item.givenName}</td>
-                                <td scope="col">{item.personalTitle}</td>
-                                <td scope="col">{item.o}</td>
-                                <td scope="col">{item.ou}</td>
+                                <td scope="col">{item.node}</td>
+                                <td scope="col">{item.system} {item.release}</td>
+                                <td scope="col">{item.machine}</td>
+                                <td scope="col">{item.processor}</td>
                             </tr>
                         )
                     })}  
@@ -127,13 +72,40 @@ const Table = (props) => {
 </table>
         
     </div>
+): (
+<>
+<button onClick={() => { setActivePage('table') }}>Back</button>
+<table border="0">
+  <thead>  
+                <tr>
+                <th>
+                  UID
+                </th>
+                <th>
+                  TIME
+                </th>
+                </tr> 
+            </thead>
+  <tbody>     
+                    {selectedItem.map((data, index) => {
+                        const timeAccess = new Date(data.timeAccess);
+                        return(  
+                            <tr key={index}>
+                                <td scope="col">{data.uid}</td>
+                                <td scope="col">{'' + timeAccess}</td>
+                            </tr>
+                        )
+                    })}  
+            </tbody>
+</table>
+</>
 )
 };
 
 export default function App() {
   return (
     <div className="App">
-      <Table Data={Data}/>
+      <Table/>
     </div>
   );
 }
