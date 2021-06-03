@@ -16,8 +16,9 @@ const [items, setItems] = useState([]);
   const [serial, setSerial] = useState('');
   const [activePage, setActivePage] = useState('table');
   const [selectedItem, setSelectedItem] = useState({});
+  
 const getDataPerangkat = () => {
-  fetch(`http://192.168.10.120:3003/user?page=1&&serial=`)
+  fetch(`http://4afbe55e85c3.ngrok.io/user?page=0&&serial=`)
       .then(res => res.json())
       .then(
         (result) => {

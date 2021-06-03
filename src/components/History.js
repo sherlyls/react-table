@@ -7,20 +7,19 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import { Link } from "react-router-dom";
 import BackComponent from '../components/BackComponent'
-import History from '../components/History'
 
 const { SearchBar } = Search;
 
 const TableComponent = (props) => {
   const [items, setItems] = useState([]);
-  console.log(props,"props")
+//   console.log(props,"props")
 
 
   //   const timeAccess = new Date(data.timeAccess);
 
   const getDetail = () => {
 
-    fetch(`http://4afbe55e85c3.ngrok.io/komputer?page=0&limit=2&serial=${props.location.state.serial}`)
+    fetch(`http://4afbe55e85c3.ngrok.io/user?page=0&&serial=`)
       .then((res) => res.json())
       .then(
         (result) => {
@@ -39,30 +38,20 @@ const TableComponent = (props) => {
     getDetail();
   }, []);
 
-  const timeAccess = new Date(items.timeAccess);
+//   const timeAccess = new Date(items.timeAccess);
 
   const columns = [
     
   {
-    dataField: "serial",
-    text: "Serial",
+    dataField: "",
+    text: "Start Date",
   },
   {
     dataField: "node",
-    text: "PC-Name",
+    text: "End Date",
   },
-  {
-    dataField: "system",
-    text: "OS",
-  },
-  {
-    dataField: "machine",
-    text: "Machine",
-  },
-  {
-    dataField: "processor",
-    text: "Processor",
-  },
+
+  
 //   {
 //     dataField: "'' + timeAccess",
 //     text: "Time Acces",
@@ -76,25 +65,19 @@ const TableComponent = (props) => {
     <Container>
       <ToolkitProvider keyField="id" data={items} columns={columns} search>
         {(props) => (
-          <div>
-             <div className="float-left">
-                 <BackComponent/>
-            </div> 
-            <div className="float-right">
-              <SearchBar {...props.searchProps} placeholder="Search..." />
-            </div>
+          <div className="mt-5">
+             <h5>List History</h5>
+
             <div>
               <BootstrapTable
                 {...props.baseProps}
-                // pagination={paginationFactory()}
+                pagination={paginationFactory()}
               />
             </div>
-            <History/>
           </div>
         )}
       </ToolkitProvider>
     </Container>
-    
   );
 };
 
