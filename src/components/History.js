@@ -7,49 +7,25 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import { Link } from "react-router-dom";
 import BackComponent from '../components/BackComponent'
+import filterFactory, { dateFilter } from 'react-bootstrap-table2-filter';
 
 const { SearchBar } = Search;
 
 const TableComponent = (props) => {
-  const [items, setItems] = useState([]);
-//   console.log(props,"props")
 
-
-  //   const timeAccess = new Date(data.timeAccess);
-
-  const getDetail = () => {
-
-    fetch(`http://4afbe55e85c3.ngrok.io/user?page=0&&serial=`)
-      .then((res) => res.json())
-      .then(
-        (result) => {
-            console.log(result, 'result')
-          setItems(result);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {}
-      );
-  };
 
   
-  useEffect(() => {
-    getDetail();
-  }, []);
-
-//   const timeAccess = new Date(items.timeAccess);
+  const [items, setItems] = useState([]);
 
   const columns = [
     
   {
     dataField: "",
-    text: "Start Date",
+    text: "Date",
+    filter: dateFilter()
+ 
   },
-  {
-    dataField: "node",
-    text: "End Date",
-  },
+
 
   
 //   {
@@ -63,7 +39,7 @@ const TableComponent = (props) => {
 
   return (
     <Container>
-      <ToolkitProvider keyField="id" data={items} columns={columns} search>
+      <ToolkitProvider keyField="id" data={items} columns={columns} search  >
         {(props) => (
           <div className="mt-5">
              <h5>List History</h5>
@@ -72,6 +48,7 @@ const TableComponent = (props) => {
               <BootstrapTable
                 {...props.baseProps}
                 pagination={paginationFactory()}
+                filter={ filterFactory()}
               />
             </div>
           </div>
